@@ -10,6 +10,8 @@ def load_texture(image_path):
     texture_surface = pygame.image.load(image_path)
     texture_data = pygame.image.tostring(texture_surface, "RGB", 1)
     width, height = texture_surface.get_rect().size
+    print ("wid,hei ",width,height)
+    #print ("tex_dat",texture_data)
 
     glEnable(GL_TEXTURE_2D)
     texture = glGenTextures(1)
@@ -18,6 +20,7 @@ def load_texture(image_path):
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data)
     
     return texture
@@ -28,28 +31,28 @@ def draw_cylinder(texture, radius, height, sides):
     
     # Draw the sides of the cylinder
     glBegin(GL_QUAD_STRIP)
-    for i in range(sides + 1):
+    for i in range(sides + 1 ):
         angle = 2 * np.pi * i / sides
         x = np.cos(angle) * radius
         y = np.sin(angle) * radius
-        glTexCoord2f(i / sides, 0)
-        glVertex3f(x, y, -height / 2)
-        glTexCoord2f(i / sides, 1)
-        glVertex3f(x, y, height / 2)
+        glTexCoord2f(0, i / sides)
+        glVertex3f(-height / 2, x, y)
+        glTexCoord2f(1, i / sides)
+        glVertex3f(+height / 2, x, y)
     glEnd()
 
-    # Draw the top and bottom of the cylinder
-    for z in [-height / 2, height / 2]:
-        glBegin(GL_TRIANGLE_FAN)
-        glTexCoord2f(0.5, 0.5)
-        glVertex3f(0, 0, z)
-        for i in range(sides + 1):
-            angle = 2 * np.pi * i / sides
-            x = np.cos(angle) * radius
-            y = np.sin(angle) * radius
-            glTexCoord2f((np.cos(angle) + 1) / 2, (np.sin(angle) + 1) / 2)
-            glVertex3f(x, y, z)
-        glEnd()
+    ## # Draw the top and bottom of the cylinder
+    ## for z in [-height / 2, height / 2]:
+    ##     glBegin(GL_TRIANGLE_FAN)
+    ##     glTexCoord2f(0.5, 0.5)
+    ##     glVertex3f(0, 0, z)
+    ##     for i in range(sides + 1):
+    ##         angle = 2 * np.pi * i / sides
+    ##         x = np.cos(angle) * radius
+    ##         y = np.sin(angle) * radius
+    ##         glTexCoord2f((np.cos(angle) + 1) / 2, (np.sin(angle) + 1) / 2)
+    ##         glVertex3f(x, y, z)
+    ##     glEnd()
 
 # Initialize the Pygame and OpenGL context
 def main(image_path):
@@ -62,7 +65,7 @@ def main(image_path):
     texture = load_texture(image_path)
     radius = 1.0
     height = 2.0
-    sides = 32
+    sides = 32  
     rotate_x, rotate_y = 0, 0
     mouse_down = False
     last_pos = (0, 0)
@@ -90,12 +93,17 @@ def main(image_path):
         glPushMatrix()
         glRotatef(rotate_x, 1, 0, 0)
         glRotatef(rotate_y, 0, 1, 0)
+        glEnable(GL_CULL_FACE)
+        glCullFace(GL_BACK)
+        draw_cylinder(texture, radius, height, sides)
+        glCullFace(GL_FRONT)
         draw_cylinder(texture, radius, height, sides)
         glPopMatrix()
         pygame.display.flip()
         pygame.time.wait(10)
 
 if __name__ == "__main__":
+    image_path = "image2.jpg"
     image_path = "image.png"
     main(image_path)
 
