@@ -63,8 +63,15 @@ def main(image_path):
     glTranslatef(0.0, 0.0, -5)
 
     texture = load_texture(image_path)
-    radius = 1.0
-    height = 2.0
+    radius = 1.0 # circumf = 2*pi
+    eta_max = 2.5
+    height = 2*eta_max
+
+    scale_factor = 0.8
+    radius *= scale_factor
+    height *= scale_factor
+
+
     sides = 32  
     rotate_x, rotate_y = 0, 0
     mouse_down = False
