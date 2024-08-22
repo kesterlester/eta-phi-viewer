@@ -35,10 +35,10 @@ def draw_cylinder(texture, radius, height, sides):
         angle = 2 * np.pi * i / sides
         x = np.cos(angle) * radius
         y = np.sin(angle) * radius
-        glTexCoord2f(0, i / sides)
-        glVertex3f(-height / 2, x, y)
-        glTexCoord2f(1, i / sides)
-        glVertex3f(+height / 2, x, y)
+        glTexCoord2f(0, 1-i / sides)
+        glVertex3f(x, y, -height / 2)
+        glTexCoord2f(1, 1-i / sides)
+        glVertex3f(x, y, +height / 2)
     glEnd()
 
     ## # Draw the top and bottom of the cylinder
